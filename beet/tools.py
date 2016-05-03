@@ -29,11 +29,11 @@ def morph_openclose(image, kernel_size=3, iterations=1):
 
 def handle_keys(delay):
     key = cv2.waitKey(delay)
-    if key == keys.SPACE:
+    if key == beet.keys.SPACE:
         key = cv2.waitKey()
-    if key == keys.Q:
+    if key == beet.keys.Q:
         exit()
-    if key == keys.ESC:
+    if key == beet.keys.ESC:
         return 1
 
 

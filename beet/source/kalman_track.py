@@ -269,13 +269,13 @@ def main():
     # videos.append("../videos/crowded_7am.h264")
     # videos.append("../videos/rpi2.h264")
     # videos.append("../videos/video1.mkv")
-    # videos.append("../videos/whitebg.h264")
+    # videos.append("../../whitebg.h264")
     # videos.append("../videos/newhive_noshadow3pm.h264")
-    videos.append("../../videos/rpi21.h264")
+    videos.append("../../test.h264")
 
 
     for video_src in videos:
-        app = App(video_src, invisible=True, bgsub_thresh=64)
+        app = App(video_src, invisible=False, bgsub_thresh=64)
         app.run()
         print("Arrivals: {0} Departures: {1}".format(app.arrivals, app.departures))
         cv2.destroyAllWindows()

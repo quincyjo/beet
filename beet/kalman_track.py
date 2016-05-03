@@ -91,7 +91,7 @@ class App:
             # Segment
             fg_mask = self.operator.apply(frame)
             fg_mask = ((fg_mask == 255) * 255).astype(np.uint8)
-            fg_mask = tools.morph_openclose(fg_mask)
+            fg_mask = beet.tools.morph_openclose(fg_mask)
 
             # Detect blobs
             version = int(re.findall(r'\d+', cv2.__version__)[0])
@@ -104,7 +104,7 @@ class App:
                 contours, _ = cv2.findContours((fg_mask.copy()),
                                                cv2.RETR_EXTERNAL,
                                                cv2.CHAIN_APPROX_TC89_L1)
-            areas, detections = drawing.draw_min_ellipse(contours,
+            areas, detections = beet.drawing.draw_min_ellipse(contours,
                                                          frame, MIN_AREA,
                                                          MAX_AREA, draw=False)
             self.areas += areas
@@ -130,7 +130,7 @@ class App:
                 cv2.imshow('Tracking', frame)
                 cv2.imshow("Mask", fg_mask)
                 delay = FRAME_DELAY
-                if tools.handle_keys(delay) == 1:
+                if beet.tools.handle_keys(delay) == 1:
                     break
             # else:
             #     if tools.handle_keys(delay) == 1:
@@ -219,7 +219,7 @@ class App:
                 for j, (x2, y2) in enumerate(detections):
                     # cv2.line(frame, (x1, y1), (x2, y2), (255, 0, 0))
                     costMatrix[i, j] = np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
-            return tools.assignment(costMatrix)
+            return beet.tools.assignment(costMatrix)
 
     def predictNewLocations(self, frame):
         for track in self.tracks:
@@ -258,9 +258,9 @@ class App:
 
     def draw_overlays(self, frame, fg_mask):
         if self.drawBoundary:
-            drawing.draw_rectangle(frame, ROI, (ROI[0]+ROI_W, ROI[1]+ROI_H))
+            beet.drawing.draw_rectangle(frame, ROI, (ROI[0]+ROI_W, ROI[1]+ROI_H))
         if self.drawFrameNum:
-            drawing.draw_frame_num(frame, self.frame_idx)
+            beet.drawing.draw_frame_num(frame, self.frame_idx)
         if self.drawContours:
             pass
             # drawing.draw_contours(frame, fg_mask)

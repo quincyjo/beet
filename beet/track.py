@@ -70,7 +70,7 @@ class Track(object):
         if len(self.locationHistory) >= 2 and self.timeInvisible == 0:
             pt0 = self.locationHistory[-2]
             pt1 = self.locationHistory[-1]
-            return tools.cross(ROI, ROI_W, ROI_H, pt0, pt1)
+            return beet.tools.cross(ROI, ROI_W, ROI_H, pt0, pt1)
         else:
             return 0
 
@@ -78,6 +78,6 @@ class Track(object):
         if len(self.locationHistory) >= 2:
             pt0 = self.locationHistory[0]
             pt1 = self.locationHistory[-1]
-            return tools.cross(ROI, ROI_W, ROI_H, pt0, pt1)
+            return beet.tools.cross(ROI, ROI_W, ROI_H, pt0, pt1)
         else:
             return 0

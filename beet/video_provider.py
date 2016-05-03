@@ -16,6 +16,5 @@ class VideoProvider:
     def __init__(self, path=""):
         self._path = path
 
-    @abc.abstractmethod
     def get_video_source(self):
         return self._path
