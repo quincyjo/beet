@@ -1,0 +1,29 @@
+Position: 178, 325
+Position: 256, 391
+Position: 274, 341
+Position: 284, 463
+Position: 376, 429
+Position: 480, 439
+Frame: 1
+Clicks: 6
+
+Position: 182, 321
+Position: 276, 349
+Position: 252, 385
+Position: 280, 461
+Position: 368, 447
+Position: 484, 443
+Frame: 2
+Clicks: 6
+
+Position: 190, 325
+Position: 282, 359
+Position: 242, 385
+Position: 284, 447
+Position: 304, 451
+Position: 478, 445
+Frame: 3
+Clicks: 6
+
+Frame: 4
+Clicks: 0
