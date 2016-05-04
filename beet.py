@@ -96,7 +96,8 @@ def main():
             app = beet.kalman_track.App(invisible=not args.visible,
                                         draw_contours=args.contours,
                                         draw_tracks=args.tracks,
-                                        draw_boundary=args.boundary)
+                                        draw_boundary=args.boundary,
+                                        draw_mask=args.mask)
             # Open the current file.
             app.openNewVideo(filepath)
             # Run the app.

@@ -46,14 +46,15 @@ MEASUREMENT_MATRIX = np.array([[1, 0, 0, 0],
 class App:
     def __init__(self, video_src="", quiet=False, invisible=False,
                  draw_contours=False, bgsub_thresh=64, draw_tracks=False,
-                 drawFrameNum=False, draw_boundary=False):
+                 draw_frame_num=False, draw_boundary=False, draw_mask=False):
         self.quiet = quiet
         self.invisible = invisible
-        self.drawContours = draw_contours
+        self.draw_contours = draw_contours
         self.threshold = bgsub_thresh
-        self.drawTracks = draw_tracks
-        self.drawFrameNum = drawFrameNum
-        self.drawBoundary = draw_boundary
+        self.draw_tracks = draw_tracks
+        self.draw_frame_num = draw_frame_num
+        self.draw_boundary = draw_boundary
+        self.draw_mask = draw_mask
 
         self.areas = []
 
@@ -76,59 +77,18 @@ class App:
         if self.invisible:
             cv2.namedWindow("Control")
 
-        prev_gray = None
-        prev_points = []
+        self.prev_gray = None
+        self.prev_points = []
         self.nextTrackID = 0
 
         while True:
-            # Get frame
-            ret, frame = self.cam.read()
-            if not ret:
+            frame, fg_mask = self.step()
+            if not frame:
                 break
-            # Convert frame to grayscale
-            frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-            # Segment
-            fg_mask = self.operator.apply(frame)
-            fg_mask = ((fg_mask == 255) * 255).astype(np.uint8)
-            fg_mask = beet.tools.morph_openclose(fg_mask)
-
-            # Detect blobs
-            version = int(re.findall(r'\d+', cv2.__version__)[0])
-            if version == 3:
-                _, contours, _ = cv2.findContours((fg_mask.copy()),
-                                                  cv2.RETR_EXTERNAL,
-                                                  cv2.CHAIN_APPROX_TC89_L1)
-            else:
-                # Get contours for detected bees using the foreground mask
-                contours, _ = cv2.findContours((fg_mask.copy()),
-                                               cv2.RETR_EXTERNAL,
-                                               cv2.CHAIN_APPROX_TC89_L1)
-            areas, detections = beet.drawing.draw_min_ellipse(contours,
-                                                         frame, MIN_AREA,
-                                                         MAX_AREA, draw=False)
-            self.areas += areas
-
-            # Track
-            self.predictNewLocations(frame)
-            assignments, unmatchedTracks, unmatchedDetections = \
-                self.assignTracks(detections, frame)
-            self.updateMatchedTracks(assignments, detections)
-            self.updateUnmatchedTracks(unmatchedTracks)
-            self.deleteLostTracks()
-            self.createNewTracks(detections, unmatchedDetections)
-            self.showTracks(frame)
-            # self.showLostTracks(frame)
-            self.checkTrackCrosses()
-
-            # Store frame and go to next
-            prev_gray = frame_gray
-            prev_points = detections
-            self.frame_idx += 1
             if not self.invisible:
-                self.draw_overlays(frame, fg_mask)
                 cv2.imshow('Tracking', frame)
-                cv2.imshow("Mask", fg_mask)
+                if self.draw_mask:
+                    cv2.imshow("Mask", fg_mask)
                 delay = FRAME_DELAY
                 if beet.tools.handle_keys(delay) == 1:
                     break
@@ -145,6 +105,64 @@ class App:
         # After the video, examine tracks
         # self.checkLostTrackCrosses()
         self.cam.release()
+
+    def step(self):
+        # Get frame
+        ret, frame = self.cam.read()
+        if not ret:
+            return False, False
+        # Convert frame to grayscale
+        frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # Segment
+        fg_mask = self._get_fg_mask(frame)
+        # Detect blobs
+        contours = self._get_cotours(fg_mask)
+        areas, detections = beet.drawing.draw_min_ellipse(
+            contours,
+            frame, MIN_AREA,
+            MAX_AREA, draw=False)
+        self.areas += areas
+
+        # Track
+        self._track(frame, detections)
+
+        # Store frame and go to next
+        self.prev_gray = frame_gray
+        self.prev_points = detections
+        self.frame_idx += 1
+        self.draw_overlays(frame, fg_mask)
+        return (frame, fg_mask)
+
+    def _get_fg_mask(self, frame):
+        mask = self.operator.apply(frame)
+        two_tone = ((mask == 255) * 255).astype(np.uint8)
+        morphed = beet.tools.morth_openclose(two_tone)
+        return morphed
+
+    def _get_cotours(self, fg_mask):
+        version = int(re.findall(r'\d+', cv2.__version__)[0])
+        if version == 3:
+            _, contours, _ = cv2.findContours((fg_mask.copy()),
+                                              cv2.RETR_EXTERNAL,
+                                              cv2.CHAIN_APPROX_TC89_L1)
+        else:
+            # Get contours for detected bees using the foreground mask
+            contours, _ = cv2.findContours((fg_mask.copy()),
+                                           cv2.RETR_EXTERNAL,
+                                           cv2.CHAIN_APPROX_TC89_L1)
+        return contours
+
+    def _track(frame, detections):
+        self.predictNewLocations(frame)
+        assignments, unmatchedTracks, unmatchedDetections = \
+            self.assignTracks(detections, frame)
+        self.updateMatchedTracks(assignments, detections)
+        self.updateUnmatchedTracks(unmatchedTracks)
+        self.deleteLostTracks()
+        self.createNewTracks(detections, unmatchedDetections)
+        self.showTracks(frame)
+        # self.showLostTracks(frame)
+        self.checkTrackCrosses()
 
     def deleteLostTracks(self):
         newTracks = []
@@ -226,7 +244,7 @@ class App:
             track.predict(frame)
 
     def showTracks(self, frame):
-        if self.drawTracks:
+        if self.draw_tracks:
             for track in self.tracks:
                 track.drawTrack(frame)
 
@@ -257,11 +275,12 @@ class App:
                 # print("Departure")
 
     def draw_overlays(self, frame, fg_mask):
-        if self.drawBoundary:
-            beet.drawing.draw_rectangle(frame, ROI, (ROI[0]+ROI_W, ROI[1]+ROI_H))
-        if self.drawFrameNum:
+        if self.draw_boundary:
+            beet.drawing.draw_rectangle(frame, ROI,
+                                        (ROI[0]+ROI_W, ROI[1]+ROI_H))
+        if self.draw_frame_num:
             beet.drawing.draw_frame_num(frame, self.frame_idx)
-        if self.drawContours:
+        if self.draw_contours:
             pass
             # drawing.draw_contours(frame, fg_mask)
 
@@ -271,27 +290,13 @@ class App:
 
 
 def main():
-    print("OpenCV version: {0}".format(cv2.__version__))
-    clock()
-    videos = []
-    # videos.append("../videos/crowded_4pm.h264")
-    # videos.append("../videos/crowded_7am.h264")
-    # videos.append("../videos/rpi2.h264")
-    # videos.append("../videos/video1.mkv")
-    # videos.append("../videos/whitebg.h264")
-    # videos.append("../videos/newhive_noshadow3pm.h264")
-    videos.append("../videos/rp21.h264")
-
-    for video_src in videos:
-        app = App(video_src, invisible=False, bgsub_thresh=64)
-        app.run()
-        print("Arrivals: {0} Departures: {1}".format(app.arrivals,
-                                                     app.departures))
-        cv2.destroyAllWindows()
-        timeElapsed = clock()
-        print("{0} seconds elapsed.".format(timeElapsed))
-        print("FPS: {0}".format(float(app.frame_idx) / timeElapsed))
-        continue
+    print(
+        "kalman_track.py: This file is not a script.\n" +
+        "  Use it via the beet module or use the beet-cli."
+    )
+    # clock()
+    # print("{0} seconds elapsed.".format(timeElapsed))
+    # print("FPS: {0}".format(float(app.frame_idx) / timeElapsed))
 
 
 if __name__ == '__main__':
