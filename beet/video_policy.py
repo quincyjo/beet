@@ -24,4 +24,4 @@ class VideoPolicy:
         if (self._args.remote):
             self._provider = FtpVideoProvider(self._args.auth)
         else:
-            self._provider = VideoProvider(path=self._args.input)
+            self._provider = VideoProvider(path=self._args.files)

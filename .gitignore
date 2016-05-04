@@ -1,6 +1,7 @@
 videos/
 auth
 tempfile.h264
+log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
