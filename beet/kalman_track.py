@@ -83,7 +83,7 @@ class App:
 
         while True:
             frame, fg_mask = self.step()
-            if not frame:
+            if not frame.any():
                 break
             if not self.invisible:
                 cv2.imshow('Tracking', frame)
@@ -152,7 +152,7 @@ class App:
                                            cv2.CHAIN_APPROX_TC89_L1)
         return contours
 
-    def _track(frame, detections):
+    def _track(self, frame, detections):
         self.predictNewLocations(frame)
         assignments, unmatchedTracks, unmatchedDetections = \
             self.assignTracks(detections, frame)
