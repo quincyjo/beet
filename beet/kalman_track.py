@@ -136,7 +136,7 @@ class App:
     def _get_fg_mask(self, frame):
         mask = self.operator.apply(frame)
         two_tone = ((mask == 255) * 255).astype(np.uint8)
-        morphed = beet.tools.morth_openclose(two_tone)
+        morphed = beet.tools.morph_openclose(two_tone)
         return morphed
 
     def _get_cotours(self, fg_mask):
