@@ -13,14 +13,23 @@ $ python beet.py [tags...] [file/files]
   "-V" or "--verbose" : Produces Verbose Output
   
   "-m" or "--mask" : Show Masked Video
+  
   "-v" or "--visible": Show Source Video
+  
   "-l" or "--log" [filepath/file] : Specifies Where the Log Outputs
+  
   "-r" or "--remote" : Access Files Through FTP (WIP: NOT FUNCTIONING)
+  
   "-t" or "--tracks" : Draw Tracks
+  
   "-c" or "--contours" : Draw Contours
+  
   "-b" or "--boundary" : Draw Entrance Boundary
+  
   "-B" or "--Bounds" [X][Y][HEIGHT][WIDTH] : Allows you to change the boundaries for the entrance manually.  All parameters required.  (X, Y) are the coordinates of the from the top-left corner of the video to the top-left corner of the entrance bound.  (HEIGHT, WIDTH) are the height and width of the bounds.  Cannot be specified alongside "-H".  
+  
   "-H" or "--Hive" [RPi #] : Provides preset boundaries for specific hives based off of Raspberry Pi Number.  Currently pre-configured for RPi 21 and 22. *more will be added in the future* Cannot be specified alongside "-B".  
+  
   "-a" or "--auth" [filepath/file] : Access source files via FTP with info in given file.  (WIP: NOT FUNCTIONING)
   
 ### NOTES
