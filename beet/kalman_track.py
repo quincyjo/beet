@@ -49,7 +49,7 @@ class App:
             self.roi_w = set_boundaries[3]
             self.roi_h = set_boundaries[2]
         elif hive_number is 21:
-            self.roi = (240, 340)
+            self.roi = (235, 340)
             self.roi_w = 200
             self.roi_h = 100
         elif hive_number is 22:

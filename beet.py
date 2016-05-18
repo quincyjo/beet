@@ -123,13 +123,17 @@ def main():
             if(args.verbose):
                 line = "File: {0}\n  Arrivales: {1}\n  Departures: {2}\n"
                 print(line.format(filepath, app.arrivals,
-                                  app.departures, app.departures))
+                                  app.departures))
 
             # If logging, log results.
             if(args.log):
-                line = "File: {0}\n  Arrivales: {1}\n  Departures: {2}\n"
-                args.log.write(line.format(filepath, app.arrivals,
-                                           app.departures))
+                line = "File: {0}\nHive: {1}\n  Arrivals: {2}\n  Departures: {3}\n"
+                if args.hive[0] is not None:
+                    args.log.write(line.format(filepath, args.hive[0],
+                                      app.arrivals, app.departures))
+                else:
+                    args.log.write(line.format(filepath, "Not Specified",
+                                      app.arrivals, app.departures))
 
             cv2.destroyAllWindows()
 
