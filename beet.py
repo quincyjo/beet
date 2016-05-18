@@ -45,8 +45,7 @@ def parse_args(parser):
         type=argparse.FileType('w'),
         help="Specifies where where to log output to",
         dest="log",
-        default='beet.log'
-    )
+        default='beet.log')
     parser.add_argument(
         '-r', '--remote',
         help="Access source files through FTP",
@@ -71,6 +70,22 @@ def parse_args(parser):
         action="store_true",
         dest="boundary",
         default=False)
+    borders = parser.add_mutually_exclusive_group()
+    borders.add_argument(
+        '-B', '--Bounds',
+        help="Change Boundary Location.  Format: [X][Y][HEIGHT][WIDTH]",
+        type=int,
+        nargs=4,
+        dest="coordinates",
+        default=(200, 200, 100, 200))
+    borders.add_argument(
+        '-H', '--Hive',
+        choices=(21, 22),
+        help="Preset Hives",
+        type=int,
+        nargs=1,
+        dest="hive",
+        default=[None])
     parser.add_argument(
         '-a', '--auth',
         help="Access source files via FTP with info in given file",
@@ -92,12 +107,13 @@ def main():
     for filepath in source:
         # If the file is valid.
         if os.path.exists(filepath):
-            # Create a new app with given options.
             app = beet.kalman_track.App(invisible=not args.visible,
                                         draw_contours=args.contours,
                                         draw_tracks=args.tracks,
                                         draw_boundary=args.boundary,
-                                        draw_mask=args.mask)
+                                        draw_mask=args.mask,
+                                        set_boundaries=tuple(args.coordinates),
+                                        hive_number=args.hive[0])
             # Open the current file.
             app.openNewVideo(filepath)
             # Run the app.
