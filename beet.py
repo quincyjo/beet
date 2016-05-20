@@ -107,13 +107,21 @@ def main():
     for filepath in source:
         # If the file is valid.
         if os.path.exists(filepath):
+            if args.hive[0] is None:
+                roi = args.coordinates
+            elif args.hive[0] is 21:
+                roi = (235, 340, 100, 200)
+            elif args.hive[0] is 22:
+                roi = (200, 360, 115, 325)
+            else:
+                print("Invalid Border Setup")
+                exit()
             app = beet.kalman_track.App(invisible=not args.visible,
                                         draw_contours=args.contours,
                                         draw_tracks=args.tracks,
                                         draw_boundary=args.boundary,
                                         draw_mask=args.mask,
-                                        set_boundaries=tuple(args.coordinates),
-                                        hive_number=args.hive[0])
+                                        set_boundaries=tuple(roi))
             # Open the current file.
             app.openNewVideo(filepath)
             # Run the app.

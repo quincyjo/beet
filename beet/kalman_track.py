@@ -43,22 +43,10 @@ class App:
     def __init__(self, video_src="", quiet=False, invisible=False,
                  draw_contours=False, bgsub_thresh=64, draw_tracks=False,
                  draw_frame_num=False, draw_boundary=False, draw_mask=False,
-                 set_boundaries=(200, 200, 100, 200), hive_number=None):
-        if hive_number is None:
-            self.roi = (set_boundaries[0], set_boundaries[1])
-            self.roi_w = set_boundaries[3]
-            self.roi_h = set_boundaries[2]
-        elif hive_number is 21:
-            self.roi = (235, 340)
-            self.roi_w = 200
-            self.roi_h = 100
-        elif hive_number is 22:
-            self.roi = (200, 360)
-            self.roi_w = 325
-            self.roi_h = 115
-        else:
-            print("Invalid Border Setup")
-            exit()
+                 set_boundaries=(200, 200, 100, 200)):
+        self.roi = (set_boundaries[0], set_boundaries[1])
+        self.roi_h = set_boundaries[2]
+        self.roi_w = set_boundaries[3]
         self.quiet = quiet
         self.invisible = invisible
         self.draw_contours = draw_contours
