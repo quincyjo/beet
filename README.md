@@ -37,7 +37,9 @@ $ python beet.py [tags...] [file/files/directories]
 ### NOTES
 
   -If "-B" and "-H" are not specified, the default bounds are X=200, Y=200, HEIGHT=100, and WIDTH=200.  
+  
   -Will run on all .h264 files in a directory if given a directory.  
+  
   -Will run on any number of files/directories given!
 
 #### FTP - WIP: Not Currently Functioning, Will Be Fixed in a Future Update!
@@ -68,12 +70,18 @@ The script will currently run in Anaconda2, but will not support it in the futur
 ### Future Work
 
   -Fix FTP
+  
   -Add more preset hives
+  
   -Integrate better logging (include RPi #, date, time, and arrivals and departures)
+  
   -Automated operation and logging on an entire folder of video files
+  
   
 ### Further Out
   
   -GUI to replace command line utility
+  
   -GUI integration into the Beemon Utility
+  
 
