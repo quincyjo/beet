@@ -5,7 +5,7 @@ Tracks beens moving in and out from the hive, keeping track of arrivals and depa
 ### Running
 
 ```bash
-$ python beet.py [tags...] [file/files]
+$ python beet.py [tags...] [file/files/directories]
 ```
 
 ### Tags
@@ -16,7 +16,9 @@ $ python beet.py [tags...] [file/files]
   
   "-v" or "--visible": Show Source Video
   
-  "-l" or "--log" [filepath/file] : Specifies Where the Log Outputs
+  "-l" or "--log" [filepath/file] : Specifies Where the Log Outputs.  Appends the log file or creates a new one if a file with that name is not found!
+
+  "-al" or "--altlog" [filename] : Alternate logging option.  Creates a log listing the file name, total number of bees counted (arrivals + departures), and the file size.  Useful for file size analytics!  Appends the log file or creates a new one if a file with that name is not found!
   
   "-r" or "--remote" : Access Files Through FTP (WIP: NOT FUNCTIONING)
   
@@ -35,6 +37,8 @@ $ python beet.py [tags...] [file/files]
 ### NOTES
 
   -If "-B" and "-H" are not specified, the default bounds are X=200, Y=200, HEIGHT=100, and WIDTH=200.  
+  -Will run on all .h264 files in a directory if given a directory.  
+  -Will run on any number of files/directories given!
 
 #### FTP - WIP: Not Currently Functioning, Will Be Fixed in a Future Update!
 beet is designed to access a serve by ftp. Create a file named 'auth' in the source directory structured as:
