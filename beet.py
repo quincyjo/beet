@@ -42,9 +42,15 @@ def parse_args(parser):
         default=False)
     parser.add_argument(
         '-l', '--log',
-        type=argparse.FileType('w'),
+        type=argparse.FileType('a'),
         help="Specifies where where to log output to",
         dest="log",
+        default='beet.log')
+    parser.add_argument(
+        '-al', '--altlog',
+        type=argparse.FileType('a'),
+        help="Specifies where where to log output to",
+        dest="altlog",
         default='beet.log')
     parser.add_argument(
         '-r', '--remote',
@@ -100,13 +106,13 @@ def main():
     if (args.files is None and not args.remote):
         print("\nPlease provide an input file(s) or specifiy remote (-r)\n")
         return
+
     video_policy = VideoPolicy(args)
     source = video_policy.get_video()
-
     # Process each file given.
     for filepath in source:
         # If the file is valid.
-        if os.path.exists(filepath):
+        if os.path.exists(filepath) and filepath.endswith(".h264"):
             if args.hive[0] is None:
                 roi = args.coordinates
             elif args.hive[0] is 21:
@@ -142,7 +148,11 @@ def main():
                 else:
                     args.log.write(line.format(filepath, "Not Specified",
                                       app.arrivals, app.departures))
-
+            if (args.altlog):
+                line = "File: {0}\tBees: {1:2d}\t Data Size: {2}\n"
+                args.altlog.write(line.format(filepath,
+                                              app.arrivals + app.departures,
+                                              os.path.getsize(filepath)))
             cv2.destroyAllWindows()
 
         # If file is invalid.
