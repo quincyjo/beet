@@ -20,7 +20,7 @@ $ python beet.py [tags...] [file/files/directories]
 
   "-al" or "--altlog" [filename] : Alternate logging option.  Creates a log listing the file name, total number of bees counted (arrivals + departures), and the file size.  Useful for file size analytics!  Appends the log file or creates a new one if a file with that name is not found!
   
-  "-r" or "--remote" : Access Files Through FTP (WIP: NOT FUNCTIONING)
+  "-r" or "--remote" : Access Files Through FTP
   
   "-t" or "--tracks" : Draw Tracks
   
@@ -32,7 +32,9 @@ $ python beet.py [tags...] [file/files/directories]
   
   "-H" or "--Hive" [RPi #] : Provides preset boundaries for specific hives based off of Raspberry Pi Number.  Currently pre-configured for RPi 21 and 22. *more will be added in the future* Cannot be specified alongside "-B".  
   
-  "-a" or "--auth" [filepath/file] : Access source files via FTP with info in given file.  (WIP: NOT FUNCTIONING)
+  "-a" or "--auth" [filepath/file] : Access source files via FTP with info in given file.  
+  
+  "-f" or "--ftp" [filepath on ftp server]: Access a file on the ftp server without having to walk through files.  Filepath begins with the rpi#.  The Filepath continues from /beemon/.  
   
 ### NOTES
 
@@ -42,13 +44,14 @@ $ python beet.py [tags...] [file/files/directories]
   
   -Will run on any number of files/directories given!
 
-#### FTP - WIP: Not Currently Functioning, Will Be Fixed in a Future Update!
+#### FTP
 beet is designed to access a serve by ftp. Create a file named 'auth' in the source directory structured as:
 
 ```
-<user>
-<pwd>
-<server>
+user
+pwd
+server
+starting-directory
 ```
 
 The beet.py script will use this information to retrieve files for tracking.

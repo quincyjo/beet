@@ -14,7 +14,7 @@ import cv2
 import beet.kalman_track
 from beet.video_policy import VideoPolicy
 
-__author__ = "verbetam"
+__author__ = "verbetam and gurnben"
 
 
 def parse_args(parser):
@@ -59,6 +59,13 @@ def parse_args(parser):
         dest="remote",
         default=False)
     parser.add_argument(
+        '-f', '--ftp',
+        dest="ftp",
+        help="Specify a filepath for the ftp connection.",
+        type=str,
+        nargs=1,
+        default=None)
+    parser.add_argument(
         '-t', '--tracks',
         help="Draw tracks",
         action="store_true",
@@ -95,12 +102,18 @@ def parse_args(parser):
     parser.add_argument(
         '-a', '--auth',
         help="Access source files via FTP with info in given file",
-        default=False)
+        type=str,
+        dest="auth",
+        nargs='?',
+        default=["beet/auth.txt"])
     args = parser.parse_args()
     return args
 
-
 def main():
+    # Wipe the contents of the temp folder first!
+    for file in os.listdir("beet/temp/"):
+        os.remove("beet/temp/" + file)
+    # Now on to the utility...
     parser = argparse.ArgumentParser(description='Bee tracker utility')
     args = parse_args(parser)
     if (args.files is None and not args.remote):
@@ -135,7 +148,7 @@ def main():
 
             # If verbose, print results.
             if(args.verbose):
-                line = "File: {0}\n  Arrivales: {1}\n  Departures: {2}\n"
+                line = "File: {0}\n  Arrivals: {1}\n  Departures: {2}\n"
                 print(line.format(filepath, app.arrivals,
                                   app.departures))
 
@@ -149,10 +162,13 @@ def main():
                     args.log.write(line.format(filepath, "Not Specified",
                                       app.arrivals, app.departures))
             if (args.altlog):
-                line = "File: {0}\tBees: {1:2d}\t Data Size: {2}\n"
+                line = "File: {0}\t {1:2d}\t {2}\n"
                 args.altlog.write(line.format(filepath,
                                               app.arrivals + app.departures,
                                               os.path.getsize(filepath)))
+            if args.remote:
+                video_policy.end(filepath)
+
             cv2.destroyAllWindows()
 
         # If file is invalid.
