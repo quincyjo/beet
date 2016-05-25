@@ -82,7 +82,7 @@ class App:
         while True:
             # Get frame
             ret, frame = self.cam.read()
-            if not ret:
+            if not frame:
                 break
             # Convert frame to grayscale
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)

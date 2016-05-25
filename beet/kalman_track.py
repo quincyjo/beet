@@ -25,10 +25,6 @@ from beet.drawing import GREEN, RED, BLUE
 import beet.keys
 from beet.background_subtractor import BackgroundSubtractor
 
-ROI = (100, 150)
-ROI_W = 370
-ROI_H = 250
-
 MIN_AREA = 200
 MAX_AREA = 1500
 
@@ -46,7 +42,11 @@ MEASUREMENT_MATRIX = np.array([[1, 0, 0, 0],
 class App:
     def __init__(self, video_src="", quiet=False, invisible=False,
                  draw_contours=False, bgsub_thresh=64, draw_tracks=False,
-                 draw_frame_num=False, draw_boundary=False, draw_mask=False):
+                 draw_frame_num=False, draw_boundary=False, draw_mask=False,
+                 set_boundaries=(200, 200, 100, 200)):
+        self.roi = (set_boundaries[0], set_boundaries[1])
+        self.roi_h = set_boundaries[2]
+        self.roi_w = set_boundaries[3]
         self.quiet = quiet
         self.invisible = invisible
         self.draw_contours = draw_contours
@@ -83,7 +83,7 @@ class App:
 
         while True:
             frame, fg_mask = self.step()
-            if not frame:
+            if frame is None:
                 break
             if not self.invisible:
                 cv2.imshow('Tracking', frame)
@@ -110,7 +110,7 @@ class App:
         # Get frame
         ret, frame = self.cam.read()
         if not ret:
-            return False, False
+            return None, False
         # Convert frame to grayscale
         frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Segment
@@ -136,7 +136,7 @@ class App:
     def _get_fg_mask(self, frame):
         mask = self.operator.apply(frame)
         two_tone = ((mask == 255) * 255).astype(np.uint8)
-        morphed = beet.tools.morth_openclose(two_tone)
+        morphed = beet.tools.morph_openclose(two_tone)
         return morphed
 
     def _get_cotours(self, fg_mask):
@@ -152,7 +152,7 @@ class App:
                                            cv2.CHAIN_APPROX_TC89_L1)
         return contours
 
-    def _track(frame, detections):
+    def _track(self, frame, detections):
         self.predictNewLocations(frame)
         assignments, unmatchedTracks, unmatchedDetections = \
             self.assignTracks(detections, frame)
@@ -255,7 +255,7 @@ class App:
 
     def checkTrackCrosses(self):
         for track in self.tracks:
-            result = track.checkCrossLastTwo(ROI, ROI_W, ROI_H)
+            result = track.checkCrossLastTwo(self.roi, self.roi_w, self.roi_h)
             if result == 1:
                 self.arrivals += 1
                 # print("Arrival")
@@ -276,8 +276,8 @@ class App:
 
     def draw_overlays(self, frame, fg_mask):
         if self.draw_boundary:
-            beet.drawing.draw_rectangle(frame, ROI,
-                                        (ROI[0]+ROI_W, ROI[1]+ROI_H))
+            beet.drawing.draw_rectangle(frame, self.roi,
+                                        (self.roi[0]+self.roi_w, self.roi[1]+self.roi_h))
         if self.draw_frame_num:
             beet.drawing.draw_frame_num(frame, self.frame_idx)
         if self.draw_contours:

@@ -6,6 +6,7 @@ returning the path to the target file.
 '''
 
 import abc
+import os
 
 __author__ = "verbetam"
 
@@ -17,4 +18,11 @@ class VideoProvider:
         self._path = path
 
     def get_video_source(self):
-        return self._path
+        answer = []
+        for path in self._path:
+            if path.endswith(".h264"):
+                answer.append(path)
+            else:
+                for file in os.listdir(path):
+                    answer.append(os.path.join(path, file))
+        return answer
